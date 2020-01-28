@@ -1,0 +1,268 @@
+<?xml version="1.0"?>
+<!--
+THESE COMMANDS AUTO-GENERATE THE NECESSARY *.urdf / *.xml
+rosrun xacro xacro -o my_spot.urdf my_spot.xacro
+rosrun xacro xacro -o my_spot.xml my_spot.xacro
+-->
+<!-- Revolute-Revolute Manipulator -->
+<robot name="my_spot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+  <xacro:include filename="$(find my_spot)/urdf/my_spot.gazebo" />
+  <!-- Import Rviz colors -->
+  <xacro:include filename="$(find my_spot)/urdf/materials.xacro" />
+  <!-- Import constants -->
+  <xacro:include filename="$(find my_spot)/urdf/property_variables.xacro" />
+  <!-- Import leg macro -->
+  <xacro:include filename="$(find my_spot)/urdf/leg.xacro" />
+
+
+
+  <!-- Used for fixing robot to Gazebo 'base_link' -->
+  <link name="world"/>
+
+ <joint name="float_torso" type="floating">
+    <parent link="world"/>
+    <child link="link_torso"/>
+    <origin xyz="0 0 ${z_width_lowerarm_left}" rpy="0 0 0"/>
+    <calibration rising="0.0"/>
+    <dynamics damping="0.0" friction="0.0"/>
+    <safety_controller k_velocity="10" k_position="15" soft_lower_limit="-2.0" soft_upper_limit="0.5" />
+  </joint>
+
+  <!-- Base Link -->
+  <link name="link_torso">
+    <collision>
+      <origin xyz="0 0 ${z_width_body/2}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_body} ${y_width_body} ${z_width_body}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 ${z_width_body/2}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_body} ${y_width_body} ${z_width_body}"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 ${z_width_body/2}" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+	  ixx="${mass / 12.0 * (y_width_body*y_width_body + z_width_body*z_width_body)}" ixy="0.0" ixz="0.0"
+	  iyy="${mass / 12.0 * (z_width_body*z_width_body + x_width_body*x_width_body)}" iyz="0.0"
+	  izz="${mass / 12.0 * (x_width_body*x_width_body + y_width_body*y_width_body)}"/>
+    </inertial>
+  </link>
+  <link name="left_latissimus_dorsi">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_body- z_width_body*2} ${z_width_body} ${z_width_body}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_body- z_width_body*2} ${z_width_body} ${z_width_body}"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+	  ixx="${mass / 12.0 * (y_width_body*y_width_body + z_width_body*z_width_body)}" ixy="0.0" ixz="0.0"
+	  iyy="${mass / 12.0 * (z_width_body*z_width_body + x_width_body*x_width_body)}" iyz="0.0"
+	  izz="${mass / 12.0 * (x_width_body*x_width_body + y_width_body*y_width_body)}"/>
+    </inertial>
+  </link>
+  <link name="right_latissimus_dorsi">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_body- z_width_body*2} ${z_width_body} ${z_width_body}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_body- z_width_body*2} ${z_width_body} ${z_width_body}"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+	  ixx="${mass / 12.0 * (y_width_body*y_width_body + z_width_body*z_width_body)}" ixy="0.0" ixz="0.0"
+	  iyy="${mass / 12.0 * (z_width_body*z_width_body + x_width_body*x_width_body)}" iyz="0.0"
+	  izz="${mass / 12.0 * (x_width_body*x_width_body + y_width_body*y_width_body)}"/>
+    </inertial>
+  </link>
+  <joint name="joint_left_latissimus_dorsi" type="fixed">
+    <parent link="link_torso"/>
+    <child link="left_latissimus_dorsi"/>
+    <origin xyz="0 ${ y_width_body/2 + axel_offset} ${ z_width_body - axel_offset }" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>   <!-- ___________________________________AXIS -->
+  </joint>
+  <joint name="joint_right_latissimus_dorsi" type="fixed">
+    <parent link="link_torso"/>
+    <child link="right_latissimus_dorsi"/>
+    <origin xyz="0 ${ -y_width_body/2 - axel_offset} ${ z_width_body - axel_offset }" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>   <!-- ___________________________________AXIS -->
+  </joint>
+
+  <!-- ###############################################################################################-->
+  <!-- ###############################################################################################-->
+  <!-- ###############################################################################################-->
+  <!-- ###############################################################################################-->
+
+  <xacro:leg NAME_limb="left_front"  s_to_t_originX="${(x_width_body/2 - axel_offset)}"
+		               s_to_t_originY="${(y_width_body/2 + axel_offset)}"
+                               s_to_t_originZ="${(z_width_body - axel_offset)}" 
+			                flipX="1"
+			                flipY="1"
+			                flipZ="1"
+PI="${PI}" mass="${mass}" width="${width}" x_width_body="${x_width_body}" y_width_body="${y_width_body}" z_width_body="${z_width_body}"
+x_width_shoulder_left="${x_width_shoulder_left}" y_width_shoulder_left="${y_width_shoulder_left}" z_width_shoulder_left="${z_width_shoulder_left}" shoulder_roll="0" shoulder_pitch="0" shoulder_yaw="0"
+x_width_upperarm_left="${x_width_upperarm_left}" y_width_upperarm_left="${y_width_upperarm_left}" z_width_upperarm_left="${z_width_upperarm_left}" upperarm_roll="0" upperarm_pitch="0" upperarm_yaw="0"
+x_width_lowerarm_left="${x_width_lowerarm_left}" y_width_lowerarm_left="${y_width_lowerarm_left}" z_width_lowerarm_left="${z_width_lowerarm_left}" lowerarm_roll="0" lowerarm_pitch="0" lowerarm_yaw="0"
+height1="${height1}" height2="${height2}" height3="${height3}" camera_link="${camera_link}" axel_offset="${axel_offset}" axel_offset_small="${axel_offset_small}"/>
+
+
+
+  <xacro:leg NAME_limb="left_rear" s_to_t_originX="${REFLECT*(x_width_body/2 - axel_offset)}"
+		             s_to_t_originY="${(y_width_body/2 + axel_offset)}"
+                             s_to_t_originZ="${(z_width_body - axel_offset)}" 
+			                flipX=" 1"
+			                flipY=" 1"
+			                flipZ=" 1"
+PI="${PI}" mass="${mass}" width="${width}" x_width_body="${x_width_body}" y_width_body="${y_width_body}" z_width_body="${z_width_body}"
+x_width_shoulder_left="${x_width_shoulder_left}" y_width_shoulder_left="${y_width_shoulder_left}" z_width_shoulder_left="${z_width_shoulder_left}" shoulder_roll="0" shoulder_pitch="0" shoulder_yaw="0"
+x_width_upperarm_left="${x_width_upperarm_left}" y_width_upperarm_left="${y_width_upperarm_left}" z_width_upperarm_left="${z_width_upperarm_left}" upperarm_roll="0" upperarm_pitch="0" upperarm_yaw="0"
+x_width_lowerarm_left="${x_width_lowerarm_left}" y_width_lowerarm_left="${y_width_lowerarm_left}" z_width_lowerarm_left="${z_width_lowerarm_left}" lowerarm_roll="0" lowerarm_pitch="0" lowerarm_yaw="0"
+height1="${height1}" height2="${height2}" height3="${height3}" camera_link="${camera_link}" axel_offset="${axel_offset}" axel_offset_small="${axel_offset_small}"/>
+
+
+
+
+  <xacro:leg NAME_limb="right_front" s_to_t_originX="${(x_width_body/2 - axel_offset)}"
+		               s_to_t_originY="${-1*(y_width_body/2 + axel_offset)}"
+                               s_to_t_originZ="${(z_width_body - axel_offset)}" 
+			                flipX=" 1"
+			                flipY=" 1"
+			                flipZ="-1"
+PI="${PI}" mass="${mass}" width="${width}" x_width_body="${x_width_body}" y_width_body="${y_width_body}" z_width_body="${z_width_body}"
+x_width_shoulder_left="${x_width_shoulder_left}" y_width_shoulder_left="${y_width_shoulder_left}" z_width_shoulder_left="${z_width_shoulder_left}" shoulder_roll="${PI}" shoulder_pitch="0" shoulder_yaw="0"
+x_width_upperarm_left="${x_width_upperarm_left}" y_width_upperarm_left="${y_width_upperarm_left}" z_width_upperarm_left="${z_width_upperarm_left}" upperarm_roll="0" upperarm_pitch="0" upperarm_yaw="0"
+x_width_lowerarm_left="${x_width_lowerarm_left}" y_width_lowerarm_left="${y_width_lowerarm_left}" z_width_lowerarm_left="${z_width_lowerarm_left}" lowerarm_roll="0" lowerarm_pitch="0" lowerarm_yaw="0"
+height1="${height1}" height2="${height2}" height3="${height3}" camera_link="${camera_link}" axel_offset="${axel_offset}" axel_offset_small="${axel_offset_small}"/>
+
+
+
+
+
+
+
+  <xacro:leg NAME_limb="right_rear" s_to_t_originX="${REFLECT*(x_width_body/2 - axel_offset)}"
+		             s_to_t_originY="${-1*(y_width_body/2 + axel_offset)}"
+                             s_to_t_originZ="${(z_width_body - axel_offset)}" 
+			                flipX=" 1"
+			                flipY=" 1"
+			                flipZ="-1"
+PI="${PI}" mass="${mass}" width="${width}" x_width_body="${x_width_body}" y_width_body="${y_width_body}" z_width_body="${z_width_body}"
+x_width_shoulder_left="${x_width_shoulder_left}" y_width_shoulder_left="${y_width_shoulder_left}" z_width_shoulder_left="${z_width_shoulder_left}" shoulder_roll="${PI}" shoulder_pitch="0" shoulder_yaw="0"
+x_width_upperarm_left="${x_width_upperarm_left}" y_width_upperarm_left="${y_width_upperarm_left}" z_width_upperarm_left="${z_width_upperarm_left}" upperarm_roll="0" upperarm_pitch="0" upperarm_yaw="0"
+x_width_lowerarm_left="${x_width_lowerarm_left}" y_width_lowerarm_left="${y_width_lowerarm_left}" z_width_lowerarm_left="${z_width_lowerarm_left}" lowerarm_roll="0" lowerarm_pitch="0" lowerarm_yaw="0"
+height1="${height1}" height2="${height2}" height3="${height3}" camera_link="${camera_link}" axel_offset="${axel_offset}" axel_offset_small="${axel_offset_small}"/>
+
+  <!-- ###############################################################################################-->
+  <!-- ###############################################################################################-->
+  <!-- ###############################################################################################-->
+  <!-- ###############################################################################################-->
+<!--
+  <joint name="hokuyo_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0 0 ${z_width_body - axel_offset/2}" rpy="0 0 0"/>
+    <parent link="link_torso"/>
+    <child link="hokuyo_link"/>
+  </joint>
+
+  <!- - Hokuyo Laser - ->
+  <link name="hokuyo_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://my_spot/meshes/hokuyo.dae"/>
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="${camera_link} 0 ${height3 - axel_offset*2}" rpy="0 0 0"/>
+    <parent link="link_torso"/>
+    <child link="camera_link"/>
+  </joint>
+
+  <!- - Camera - ->
+  <link name="camera_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${camera_link} ${camera_link} ${camera_link}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${camera_link} ${camera_link} ${camera_link}"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <!- - generate an optical frame http://www.ros.org/reps/rep-0103.html#suffix-frames
+      so that ros and opencv can operate on the camera frame correctly - ->
+  <joint name="camera_optical_joint" type="fixed">
+    <!- - these values have to be these values otherwise the gazebo camera image
+        won't be aligned properly with the frame it is supposedly originating from - ->
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+    <parent link="camera_link"/>
+    <child link="camera_link_optical"/>
+  </joint>
+
+  <link name="camera_link_optical">
+  </link>
+-->
+
+
+
+</robot>

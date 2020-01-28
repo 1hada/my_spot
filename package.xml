@@ -1,0 +1,27 @@
+<package>
+  <name>my_spot</name>
+  <version>0.1.0</version>
+  <description>my_spot</description>
+  <maintainer email="js5425@columbia.edu">Jonathan Sanbria</maintainer>
+
+  <license>BSD</license>
+
+  <author email="js5425@columbia.edu">Jonathan Sanbria</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>controller_manager</run_depend>
+  <run_depend>joint_state_controller</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>rqt_gui</run_depend>
+  <run_depend>effort_controllers</run_depend>
+
+  <run_depend>gazebo_plugins</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>gazebo_ros_control</run_depend>
+  <run_depend>xacro</run_depend>
+
+  <export>
+  </export>
+</package>

@@ -1,0 +1,387 @@
+<?xml version="1.0"?>
+
+<robot name="my_spot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+					    shoulder to torso == s_to_t_origin*
+                          use: 1 to NOT FLIP, and -1 YES FLIP == geometry_flip*
+  -->
+
+  <xacro:macro name="leg" params="NAME_limb s_to_t_originX s_to_t_originY s_to_t_originZ
+				                     flipX          flipY          flipZ
+	  PI mass width x_width_body y_width_body z_width_body
+	  x_width_shoulder_left y_width_shoulder_left z_width_shoulder_left shoulder_roll shoulder_pitch shoulder_yaw
+	  x_width_upperarm_left y_width_upperarm_left z_width_upperarm_left upperarm_roll upperarm_pitch upperarm_yaw
+	  x_width_lowerarm_left y_width_lowerarm_left z_width_lowerarm_left lowerarm_roll lowerarm_pitch lowerarm_yaw
+	  height1 height2 height3 camera_link axel_offset axel_offset_small ">
+
+  <!-- ALSO EDIT 
+               *.xacro
+               *.gazebo
+       *_control.launch
+       *_control.yaml
+       *move_robot.cpp
+   -->
+
+  <xacro:property name="upperarm_inertia">
+    <inertial>
+      <origin xyz="${-x_width_upperarm_left/2 + axel_offset*6  } ${y_width_upperarm_left+axel_offset_small} 0" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+	  ixx="${mass / 12.0 * (y_width_upperarm_left*y_width_upperarm_left + z_width_upperarm_left*z_width_upperarm_left)}" ixy="0.0" ixz="0.0"
+	  iyy="${mass / 12.0 * (z_width_upperarm_left*z_width_upperarm_left + x_width_upperarm_left*x_width_upperarm_left)}" iyz="0.0"
+	  izz="${mass / 12.0 * (x_width_upperarm_left*x_width_upperarm_left + y_width_upperarm_left*y_width_upperarm_left)}"/>
+    </inertial>
+  </xacro:property>
+
+  <xacro:property name="forearm_geometry">
+      <origin xyz="${x_width_lowerarm_left/2-axel_offset*3} 0 ${-z_width_lowerarm_left/2 + axel_offset}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_lowerarm_left + axel_offset*4 } ${y_width_lowerarm_left} ${z_width_lowerarm_left}"/>
+      </geometry>
+  </xacro:property>
+
+
+
+
+
+  <!-- Middle Link shoulder -->
+  <link name="link2_${NAME_limb}" >
+    <collision>
+      <origin xyz="0 ${x_width_shoulder_left/2} ${z_width_shoulder_left/2 - axel_offset}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_shoulder_left} ${y_width_shoulder_left} ${z_width_shoulder_left}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 ${x_width_shoulder_left/2} ${z_width_shoulder_left/2 - axel_offset}" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_shoulder_left} ${y_width_shoulder_left} ${z_width_shoulder_left}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+
+    <inertial>
+      <origin xyz="0 ${x_width_shoulder_left/2} ${z_width_shoulder_left/2 - axel_offset}" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+	  ixx="${mass / 12.0 * (y_width_shoulder_left*y_width_shoulder_left + z_width_shoulder_left*z_width_shoulder_left)}" ixy="0.0" ixz="0.0"
+	  iyy="${mass / 12.0 * (z_width_shoulder_left*z_width_shoulder_left + x_width_shoulder_left*x_width_shoulder_left)}" iyz="0.0"
+	  izz="${mass / 12.0 * (x_width_shoulder_left*x_width_shoulder_left + y_width_shoulder_left*y_width_shoulder_left)}"/>
+    </inertial>
+  </link>
+
+
+
+
+
+  <!-- UPPERARM Link inner- ->-->
+  <link name="link3_inner_${NAME_limb}">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_upperarm_left} ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_upperarm_left} ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <xacro:insert_block name="upperarm_inertia" />
+  </link>
+
+ <!-- UPPERARM Link inner BRACE-->
+  <link name="link3_inner_brace_${NAME_limb}">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${z_width_upperarm_left} ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${z_width_upperarm_left} ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <xacro:insert_block name="upperarm_inertia" />
+  </link>
+
+  <!-- UPPERARM Link middle-->
+  <link name="link3_middle_${NAME_limb}">
+    <collision>
+      <origin xyz="${-x_width_upperarm_left/2 + axel_offset*4 } ${y_width_upperarm_left+axel_offset_small} 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_upperarm_left - axel_offset*6 } ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="${-x_width_upperarm_left/2 + axel_offset*4 } ${y_width_upperarm_left+axel_offset_small} 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_upperarm_left - axel_offset*6 } ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <xacro:insert_block name="upperarm_inertia" />
+  </link>
+  <!-- UPPERARM Link outer-->
+  <link name="link3_outer_${NAME_limb}">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_upperarm_left} ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${x_width_upperarm_left} ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+    <xacro:insert_block name="upperarm_inertia" />
+  </link>
+
+ <!-- UPPERARM Link outer BRACE-->
+  <link name="link3_outer_brace_${NAME_limb}">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${z_width_upperarm_left} ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${z_width_upperarm_left} ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+    <xacro:insert_block name="upperarm_inertia" />
+  </link>
+
+ <!-- UPPERARM Link outer x-->
+  <link name="link3_outer_x_${NAME_limb}">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${z_width_upperarm_left} ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	<box size="${z_width_upperarm_left} ${y_width_upperarm_left} ${z_width_upperarm_left}"/>
+      </geometry>
+      <material name="green"/>
+    </visual>
+    <xacro:insert_block name="upperarm_inertia" />
+  </link>
+
+  <!-- FOREARM Link -->
+  <link name="link4_${NAME_limb}">
+    <collision>
+    <xacro:insert_block name="forearm_geometry" />
+    </collision>
+
+    <visual>
+    <xacro:insert_block name="forearm_geometry" />
+      <material name="blue"/>
+    </visual>
+
+    <inertial>
+      <origin xyz="${x_width_lowerarm_left/2-axel_offset*3} 0 ${-z_width_lowerarm_left/2 + axel_offset}" rpy="0 0 0"/>
+      <mass value="${mass}"/>
+      <inertia
+	  ixx="${mass / 12.0 * (y_width_lowerarm_left*y_width_lowerarm_left + z_width_lowerarm_left*z_width_lowerarm_left)}" ixy="0.0" ixz="0.0"
+	  iyy="${mass / 12.0 * (z_width_lowerarm_left*z_width_lowerarm_left + x_width_lowerarm_left*x_width_lowerarm_left)}" iyz="0.0"
+	  izz="${mass / 12.0 * (x_width_lowerarm_left*x_width_lowerarm_left + y_width_lowerarm_left*y_width_lowerarm_left)}"/>
+    </inertial>
+  </link>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <!-- Middle joint ( shoulder to torso ) -->
+  <joint name="joint1_${NAME_limb}" type="continuous">
+    <parent link="link_torso"/>
+    <child link="link2_${NAME_limb}"/>
+    <origin xyz="${s_to_t_originX} ${s_to_t_originY} ${s_to_t_originZ}" rpy="${shoulder_roll} ${shoulder_pitch} ${shoulder_yaw}"/>
+    <axis xyz="1 0 0"/>   <!-- ___________________________________AXIS -->
+    <dynamics damping="4.2" friction="1"/>
+  </joint>
+  <!-- Middle joint ( upperarm to shoulder ) -->
+  <joint name="joint2_${NAME_limb}" type="continuous">
+    <parent link="link2_${NAME_limb}"/>
+    <child link="link3_middle_${NAME_limb}"/>
+    <origin xyz="0 ${flipY*(y_width_shoulder_left/2+axel_offset_small*3)} 0" rpy="${upperarm_roll} ${upperarm_pitch} ${upperarm_yaw}"/>
+    <axis xyz="0 1 0"/>     <!-- ___________________________________AXIS -->
+    <dynamics damping="4.2"/>
+  </joint>
+
+  <!-- UPPERARM Link inner- ->-->
+
+  <joint name="joint3_inner_${NAME_limb}" type="fixed">
+    <parent link="link3_middle_${NAME_limb}"/>
+    <child link="link3_inner_${NAME_limb}"/>
+    <origin xyz="${flipX*(-x_width_upperarm_left/2 + axel_offset ) } ${ flipY*(axel_offset_small ) } 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>     <!-- ___________________________________AXIS -->
+    <dynamics damping="4.2"/>
+  </joint>
+ <!-- UPPERARM joint inner BRACE-->
+
+  <joint name="joint3_inner_brace_${NAME_limb}" type="fixed">
+    <parent link="link3_inner_${NAME_limb}"/>
+    <child link="link3_inner_brace_${NAME_limb}"/>
+    <origin xyz="${flipX*(-x_width_upperarm_left/2 + axel_offset ) } 0 ${ flipZ*(-z_width_upperarm_left) }" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>     
+    <dynamics damping="4.2"/>
+  </joint>
+  <!-- UPPERARM Link middle-->
+
+  <!-- UPPERARM joint outer-->
+  <joint name="joint3_outer_${NAME_limb}" type="fixed">
+    <parent link="link3_middle_${NAME_limb}"/>
+    <child link="link3_outer_${NAME_limb}"/>
+    <origin xyz="${flipX*(-x_width_upperarm_left/2 + axel_offset ) } ${flipY*( y_width_upperarm_left*2 + axel_offset_small) } 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>     
+    <dynamics damping="4.2"/>
+  </joint>
+ <!-- UPPERARM joint outer BRACE-->
+  <joint name="joint3_outer_brace_${NAME_limb}" type="fixed">
+    <parent link="link3_outer_${NAME_limb}"/>
+    <child link="link3_outer_brace_${NAME_limb}"/>
+    <origin xyz="${flipX*(-x_width_upperarm_left/2 + axel_offset ) } 0 ${flipZ*( -z_width_upperarm_left ) }" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>     
+    <dynamics damping="4.2"/>
+  </joint>
+ <!-- UPPERARM joint outer x-->
+  <joint name="joint3_outer_x_${NAME_limb}" type="fixed">
+    <parent link="link3_outer_${NAME_limb}"/>
+    <child link="link3_outer_x_${NAME_limb}"/>
+    <origin xyz="${flipX*(-x_width_upperarm_left/2 + axel_offset ) } 0 ${ flipZ*(z_width_upperarm_left) }" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>     
+    <dynamics damping="4.2"/>
+  </joint>
+
+  <!-- FOREARM joint -->
+  <joint name="joint3_${NAME_limb}" type="continuous">
+    <parent link="link3_middle_${NAME_limb}"/>
+    <child link="link4_${NAME_limb}"/>
+    <origin xyz="${ flipX*(-x_width_upperarm_left + axel_offset*2 )} ${ flipY*(y_width_upperarm_left/2 + axel_offset_small*2 )} ${flipZ*(z_width_upperarm_left - axel_offset*4)}" rpy="${lowerarm_roll} ${lowerarm_pitch} ${lowerarm_yaw}"/>
+    <axis xyz="0 1 0"/>     <!-- ___________________________________AXIS -->
+    <dynamics damping="4.2"/>
+  </joint>
+
+
+
+
+
+  <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint1_${NAME_limb}">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor1">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran2">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint2_${NAME_limb}">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor2">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="tran3">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint3_${NAME_limb}">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor3">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+
+
+  <!-- Link2 -->
+  <gazebo reference="link2_${NAME_limb}">
+    <mu1>10</mu1>
+    <mu2>1</mu2>
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <!-- Link3_inner -->
+  <gazebo reference="link3_inner_${NAME_limb}">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/White</material>
+  </gazebo>
+  <!-- Link3_inner_brace -->
+  <gazebo reference="link3_inner_brace_${NAME_limb}">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/White</material>
+  </gazebo>
+  <!-- Link3 -->
+  <gazebo reference="link3_middle_${NAME_limb}">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <!-- Link3_outer -->
+  <gazebo reference="link3_outer_${NAME_limb}">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Green</material>
+  </gazebo>
+  <!-- Link3_outer_brace -->
+  <gazebo reference="link3_outer_brace_${NAME_limb}">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Green</material>
+  </gazebo>
+  <!-- Link3_outer_x -->
+  <gazebo reference="link3_outer_x_${NAME_limb}">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Green</material>
+  </gazebo>
+
+  <!-- Link4 -->
+  <gazebo reference="link4_${NAME_limb}">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  </xacro:macro>
+
+
+</robot>
