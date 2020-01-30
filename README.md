@@ -1,4 +1,4 @@
-
+# My Spot ( A frame inspired by Boston Dynamics )
 I took what I learned from the Gazebo ROS demo ( specifically http://gazebosim.org/tutorials/?tut=ros_urdf )
 to make a frame for my own spot. 
 My main goals for the project were to become familiar with macros.
@@ -18,21 +18,21 @@ Enjoy!
 
 These are the steps I take. They may be different for you depending on how you set your machine up.
 
-#STEP1
+# STEP1
 ```
 catkin_create_pkg my_spot
 ```
-#STEP2
+# STEP2
 ```
 cd ~/catkin_ws
 catkin build
 . ~/catkin_ws/devel/setup.bash
 ```
-#STEP3
+# STEP3
 ```
 roslaunch my_spot my_spot_world.launch
 ```
-#STEP4
+# STEP4
 ```
 cd ~/catkin_ws/src/my_spot/src
 

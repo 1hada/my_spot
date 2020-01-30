@@ -45,19 +45,19 @@ class Robot {
 	ros::NodeHandle nh;
 
         robot_name=node_name; 
-	Limb left_front( "left_front" , nh , "/rrbot/joint1_position_controller_left_front/command"
-					   , "/rrbot/joint2_position_controller_left_front/command"
-					   , "/rrbot/joint3_position_controller_left_front/command");
-	Limb  left_rear( "left_rear" , nh  , "/rrbot/joint1_position_controller_left_rear/command"
-					   , "/rrbot/joint2_position_controller_left_rear/command"
-					   , "/rrbot/joint3_position_controller_left_rear/command");
+	Limb left_front( "left_front" , nh , "/my_spot/joint1_position_controller_left_front/command"
+					   , "/my_spot/joint2_position_controller_left_front/command"
+					   , "/my_spot/joint3_position_controller_left_front/command");
+	Limb  left_rear( "left_rear" , nh  , "/my_spot/joint1_position_controller_left_rear/command"
+					   , "/my_spot/joint2_position_controller_left_rear/command"
+					   , "/my_spot/joint3_position_controller_left_rear/command");
 
-	Limb right_front( "right_front" , nh, "/rrbot/joint1_position_controller_right_front/command"
-					   , "/rrbot/joint2_position_controller_right_front/command"
-					   , "/rrbot/joint3_position_controller_right_front/command");
-	Limb  right_rear( "right_rear" , nh, "/rrbot/joint1_position_controller_right_rear/command"
-					   , "/rrbot/joint2_position_controller_right_rear/command"
-					   , "/rrbot/joint3_position_controller_right_rear/command");
+	Limb right_front( "right_front" , nh, "/my_spot/joint1_position_controller_right_front/command"
+					   , "/my_spot/joint2_position_controller_right_front/command"
+					   , "/my_spot/joint3_position_controller_right_front/command");
+	Limb  right_rear( "right_rear" , nh, "/my_spot/joint1_position_controller_right_rear/command"
+					   , "/my_spot/joint2_position_controller_right_rear/command"
+					   , "/my_spot/joint3_position_controller_right_rear/command");
 
 	ros::Rate loop_rate(1000);
 
@@ -80,19 +80,22 @@ class Robot {
 	   * given as a template parameter to the advertise<>() call, as was done
 	   * in the constructor above.
 	   */
-
+	if( count < 19 ){
 	  left_front.full_anterior_extend_limb(  is_left_side = true  , is_rear = false );
 	  right_front.full_anterior_extend_limb( is_left_side = false , is_rear = false );
 	  left_rear.full_anterior_extend_limb(   is_left_side = true  , is_rear = true );
 	  right_rear.full_anterior_extend_limb(  is_left_side = false , is_rear = true );
 
 	     	  std::this_thread::sleep_for (std::chrono::seconds(1));
-/*
-	  left_front.full_cranial_extend_limb(   is_left_side = true );
-	  right_front.full_cranial_extend_limb(  is_left_side = false   );
-	     	  std::this_thread::sleep_for (std::chrono::seconds(3));
-*/
-	  if( count > 19 ){ exit( 0 );}
+	}else if ( count < 25 ){
+	  //left_front.full_cranial_extend_limb(   is_left_side = true );
+	  right_front.full_cranial_extend_limb(  is_left_side = false , is_rear = false );
+	  //   	  std::this_thread::sleep_for (std::chrono::seconds(3));
+	}else if ( count < 38 ){
+	  //left_front.full_cranial_extend_limb(   is_left_side = true );
+	  //left_rear.full_cranial_extend_limb(  is_left_side = true , is_rear = true );
+	  //   	  std::this_thread::sleep_for (std::chrono::seconds(3));
+	} else { exit( 0 );}
 	  ros::spinOnce();
 
 
@@ -134,9 +137,9 @@ class Robot {
 		upperarm_pub = nh.advertise<std_msgs::Float64>(j2cont, 1000);
 		forearm_pub  = nh.advertise<std_msgs::Float64>(j3cont, 1000);
 /*
-		shoulder_pub = nh.advertise<std_msgs::Float64>("/rrbot/joint1_position_controller_left_front/command", 1000);
-		upperarm_pub = nh.advertise<std_msgs::Float64>("/rrbot/joint2_position_controller_left_front/command", 1000);
-		forearm_pub  = nh.advertise<std_msgs::Float64>("/rrbot/joint3_position_controller_left_front/command", 1000);
+		shoulder_pub = nh.advertise<std_msgs::Float64>("/my_spot/joint1_position_controller_left_front/command", 1000);
+		upperarm_pub = nh.advertise<std_msgs::Float64>("/my_spot/joint2_position_controller_left_front/command", 1000);
+		forearm_pub  = nh.advertise<std_msgs::Float64>("/my_spot/joint3_position_controller_left_front/command", 1000);
 */
 	    } 
 
